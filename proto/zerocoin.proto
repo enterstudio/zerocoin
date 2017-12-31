@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package proto;
+
+// The ZeroCoin service definition.
+service ZeroCoin {
+  rpc QueryLatest(stream LatestRequest) returns (stream Block){}
+  rpc QueryAll(stream AllRequest) returns (stream Blockchain){}
+}
+
+// Request the latest block on the blockchain.
+message LatestRequest {}
+
+// Request the whole blockchains.
+message AllRequest {}
+
+message Block {
+    uint64 index = 1;
+    string hash = 2;
+    string previousHash = 3;
+    int64 timestamp = 4;
+    string data = 5;
+}
+
+message Blockchain {
+    repeated Block blockchain = 1;
+}
