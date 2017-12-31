@@ -1,16 +1,16 @@
-package main
+package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/spiermar/zerocoin/blockchain"
 )
 
-func main() {
-	blockchain.GenerateGenesisBlock("Hello, World!")
-
+// InitServer initialized the API server
+func InitServer(port int) {
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
@@ -24,5 +24,5 @@ func main() {
 		return c.String(http.StatusOK, string(out))
 	})
 
-	e.Start(":1323")
+	e.Start(fmt.Sprintf(":%d", port))
 }

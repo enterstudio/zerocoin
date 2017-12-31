@@ -8,8 +8,6 @@ It is generated from these files:
 	zerocoin.proto
 
 It has these top-level messages:
-	LatestRequest
-	AllRequest
 	Block
 	Blockchain
 */
@@ -35,24 +33,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto1.ProtoPackageIsVersion2 // please upgrade the proto package
 
-// Request the latest block on the blockchain.
-type LatestRequest struct {
-}
-
-func (m *LatestRequest) Reset()                    { *m = LatestRequest{} }
-func (m *LatestRequest) String() string            { return proto1.CompactTextString(m) }
-func (*LatestRequest) ProtoMessage()               {}
-func (*LatestRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
-
-// Request the whole blockchains.
-type AllRequest struct {
-}
-
-func (m *AllRequest) Reset()                    { *m = AllRequest{} }
-func (m *AllRequest) String() string            { return proto1.CompactTextString(m) }
-func (*AllRequest) ProtoMessage()               {}
-func (*AllRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
 type Block struct {
 	Index        uint64 `protobuf:"varint,1,opt,name=index" json:"index,omitempty"`
 	Hash         string `protobuf:"bytes,2,opt,name=hash" json:"hash,omitempty"`
@@ -64,7 +44,7 @@ type Block struct {
 func (m *Block) Reset()                    { *m = Block{} }
 func (m *Block) String() string            { return proto1.CompactTextString(m) }
 func (*Block) ProtoMessage()               {}
-func (*Block) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*Block) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 func (m *Block) GetIndex() uint64 {
 	if m != nil {
@@ -108,7 +88,7 @@ type Blockchain struct {
 func (m *Blockchain) Reset()                    { *m = Blockchain{} }
 func (m *Blockchain) String() string            { return proto1.CompactTextString(m) }
 func (*Blockchain) ProtoMessage()               {}
-func (*Blockchain) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*Blockchain) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *Blockchain) GetBlockchain() []*Block {
 	if m != nil {
@@ -118,8 +98,6 @@ func (m *Blockchain) GetBlockchain() []*Block {
 }
 
 func init() {
-	proto1.RegisterType((*LatestRequest)(nil), "proto.LatestRequest")
-	proto1.RegisterType((*AllRequest)(nil), "proto.AllRequest")
 	proto1.RegisterType((*Block)(nil), "proto.Block")
 	proto1.RegisterType((*Blockchain)(nil), "proto.Blockchain")
 }
@@ -132,45 +110,45 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ZeroCoin service
+// Client API for Synchronization service
 
-type ZeroCoinClient interface {
-	QueryLatest(ctx context.Context, opts ...grpc.CallOption) (ZeroCoin_QueryLatestClient, error)
-	QueryAll(ctx context.Context, opts ...grpc.CallOption) (ZeroCoin_QueryAllClient, error)
+type SynchronizationClient interface {
+	SyncLatest(ctx context.Context, opts ...grpc.CallOption) (Synchronization_SyncLatestClient, error)
+	SyncAll(ctx context.Context, opts ...grpc.CallOption) (Synchronization_SyncAllClient, error)
 }
 
-type zeroCoinClient struct {
+type synchronizationClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewZeroCoinClient(cc *grpc.ClientConn) ZeroCoinClient {
-	return &zeroCoinClient{cc}
+func NewSynchronizationClient(cc *grpc.ClientConn) SynchronizationClient {
+	return &synchronizationClient{cc}
 }
 
-func (c *zeroCoinClient) QueryLatest(ctx context.Context, opts ...grpc.CallOption) (ZeroCoin_QueryLatestClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_ZeroCoin_serviceDesc.Streams[0], c.cc, "/proto.ZeroCoin/QueryLatest", opts...)
+func (c *synchronizationClient) SyncLatest(ctx context.Context, opts ...grpc.CallOption) (Synchronization_SyncLatestClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_Synchronization_serviceDesc.Streams[0], c.cc, "/proto.Synchronization/SyncLatest", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &zeroCoinQueryLatestClient{stream}
+	x := &synchronizationSyncLatestClient{stream}
 	return x, nil
 }
 
-type ZeroCoin_QueryLatestClient interface {
-	Send(*LatestRequest) error
+type Synchronization_SyncLatestClient interface {
+	Send(*Block) error
 	Recv() (*Block, error)
 	grpc.ClientStream
 }
 
-type zeroCoinQueryLatestClient struct {
+type synchronizationSyncLatestClient struct {
 	grpc.ClientStream
 }
 
-func (x *zeroCoinQueryLatestClient) Send(m *LatestRequest) error {
+func (x *synchronizationSyncLatestClient) Send(m *Block) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *zeroCoinQueryLatestClient) Recv() (*Block, error) {
+func (x *synchronizationSyncLatestClient) Recv() (*Block, error) {
 	m := new(Block)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -178,30 +156,30 @@ func (x *zeroCoinQueryLatestClient) Recv() (*Block, error) {
 	return m, nil
 }
 
-func (c *zeroCoinClient) QueryAll(ctx context.Context, opts ...grpc.CallOption) (ZeroCoin_QueryAllClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_ZeroCoin_serviceDesc.Streams[1], c.cc, "/proto.ZeroCoin/QueryAll", opts...)
+func (c *synchronizationClient) SyncAll(ctx context.Context, opts ...grpc.CallOption) (Synchronization_SyncAllClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_Synchronization_serviceDesc.Streams[1], c.cc, "/proto.Synchronization/SyncAll", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &zeroCoinQueryAllClient{stream}
+	x := &synchronizationSyncAllClient{stream}
 	return x, nil
 }
 
-type ZeroCoin_QueryAllClient interface {
-	Send(*AllRequest) error
+type Synchronization_SyncAllClient interface {
+	Send(*Blockchain) error
 	Recv() (*Blockchain, error)
 	grpc.ClientStream
 }
 
-type zeroCoinQueryAllClient struct {
+type synchronizationSyncAllClient struct {
 	grpc.ClientStream
 }
 
-func (x *zeroCoinQueryAllClient) Send(m *AllRequest) error {
+func (x *synchronizationSyncAllClient) Send(m *Blockchain) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *zeroCoinQueryAllClient) Recv() (*Blockchain, error) {
+func (x *synchronizationSyncAllClient) Recv() (*Blockchain, error) {
 	m := new(Blockchain)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -209,83 +187,83 @@ func (x *zeroCoinQueryAllClient) Recv() (*Blockchain, error) {
 	return m, nil
 }
 
-// Server API for ZeroCoin service
+// Server API for Synchronization service
 
-type ZeroCoinServer interface {
-	QueryLatest(ZeroCoin_QueryLatestServer) error
-	QueryAll(ZeroCoin_QueryAllServer) error
+type SynchronizationServer interface {
+	SyncLatest(Synchronization_SyncLatestServer) error
+	SyncAll(Synchronization_SyncAllServer) error
 }
 
-func RegisterZeroCoinServer(s *grpc.Server, srv ZeroCoinServer) {
-	s.RegisterService(&_ZeroCoin_serviceDesc, srv)
+func RegisterSynchronizationServer(s *grpc.Server, srv SynchronizationServer) {
+	s.RegisterService(&_Synchronization_serviceDesc, srv)
 }
 
-func _ZeroCoin_QueryLatest_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ZeroCoinServer).QueryLatest(&zeroCoinQueryLatestServer{stream})
+func _Synchronization_SyncLatest_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SynchronizationServer).SyncLatest(&synchronizationSyncLatestServer{stream})
 }
 
-type ZeroCoin_QueryLatestServer interface {
+type Synchronization_SyncLatestServer interface {
 	Send(*Block) error
-	Recv() (*LatestRequest, error)
+	Recv() (*Block, error)
 	grpc.ServerStream
 }
 
-type zeroCoinQueryLatestServer struct {
+type synchronizationSyncLatestServer struct {
 	grpc.ServerStream
 }
 
-func (x *zeroCoinQueryLatestServer) Send(m *Block) error {
+func (x *synchronizationSyncLatestServer) Send(m *Block) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *zeroCoinQueryLatestServer) Recv() (*LatestRequest, error) {
-	m := new(LatestRequest)
+func (x *synchronizationSyncLatestServer) Recv() (*Block, error) {
+	m := new(Block)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func _ZeroCoin_QueryAll_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ZeroCoinServer).QueryAll(&zeroCoinQueryAllServer{stream})
+func _Synchronization_SyncAll_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SynchronizationServer).SyncAll(&synchronizationSyncAllServer{stream})
 }
 
-type ZeroCoin_QueryAllServer interface {
+type Synchronization_SyncAllServer interface {
 	Send(*Blockchain) error
-	Recv() (*AllRequest, error)
+	Recv() (*Blockchain, error)
 	grpc.ServerStream
 }
 
-type zeroCoinQueryAllServer struct {
+type synchronizationSyncAllServer struct {
 	grpc.ServerStream
 }
 
-func (x *zeroCoinQueryAllServer) Send(m *Blockchain) error {
+func (x *synchronizationSyncAllServer) Send(m *Blockchain) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *zeroCoinQueryAllServer) Recv() (*AllRequest, error) {
-	m := new(AllRequest)
+func (x *synchronizationSyncAllServer) Recv() (*Blockchain, error) {
+	m := new(Blockchain)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-var _ZeroCoin_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.ZeroCoin",
-	HandlerType: (*ZeroCoinServer)(nil),
+var _Synchronization_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.Synchronization",
+	HandlerType: (*SynchronizationServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "QueryLatest",
-			Handler:       _ZeroCoin_QueryLatest_Handler,
+			StreamName:    "SyncLatest",
+			Handler:       _Synchronization_SyncLatest_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
 		{
-			StreamName:    "QueryAll",
-			Handler:       _ZeroCoin_QueryAll_Handler,
+			StreamName:    "SyncAll",
+			Handler:       _Synchronization_SyncAll_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
@@ -296,22 +274,20 @@ var _ZeroCoin_serviceDesc = grpc.ServiceDesc{
 func init() { proto1.RegisterFile("zerocoin.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 261 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x54, 0x50, 0x3d, 0x4f, 0xc3, 0x30,
-	0x14, 0xc4, 0x24, 0x41, 0xed, 0x6b, 0x00, 0xf5, 0xa9, 0x43, 0x54, 0x31, 0x44, 0x9e, 0x3c, 0xa0,
-	0x0a, 0x15, 0x09, 0x24, 0xb6, 0xc2, 0xc2, 0xc0, 0x82, 0x47, 0x36, 0x37, 0xb5, 0x14, 0x0b, 0x37,
-	0x0e, 0xb6, 0x83, 0xf8, 0xf8, 0x01, 0xfc, 0x6d, 0x14, 0xbb, 0xd0, 0x66, 0xf2, 0xbb, 0x3b, 0xdf,
-	0xd9, 0xef, 0xe0, 0xec, 0x4b, 0x5a, 0x53, 0x19, 0xd5, 0x2c, 0x5a, 0x6b, 0xbc, 0xc1, 0x2c, 0x1c,
-	0xf4, 0x1c, 0x4e, 0x9f, 0x84, 0x97, 0xce, 0x73, 0xf9, 0xd6, 0x49, 0xe7, 0x69, 0x0e, 0xb0, 0xd2,
-	0xfa, 0x0f, 0xfd, 0x10, 0xc8, 0xee, 0xb5, 0xa9, 0x5e, 0x71, 0x06, 0x99, 0x6a, 0x36, 0xf2, 0xa3,
-	0x20, 0x25, 0x61, 0x29, 0x8f, 0x00, 0x11, 0xd2, 0x5a, 0xb8, 0xba, 0x38, 0x2e, 0x09, 0x1b, 0xf3,
-	0x30, 0x23, 0x85, 0xbc, 0xb5, 0xf2, 0x5d, 0x99, 0xce, 0x3d, 0xf6, 0x5a, 0x12, 0xb4, 0x01, 0x87,
-	0x17, 0x30, 0xf6, 0x6a, 0x2b, 0x9d, 0x17, 0xdb, 0xb6, 0x48, 0x4b, 0xc2, 0x12, 0xbe, 0x27, 0xfa,
-	0xd4, 0x8d, 0xf0, 0xa2, 0xc8, 0x62, 0x6a, 0x3f, 0xd3, 0x3b, 0x80, 0xf0, 0x91, 0xaa, 0x16, 0xaa,
-	0xc1, 0x4b, 0x80, 0xf5, 0x3f, 0x2a, 0x48, 0x99, 0xb0, 0xc9, 0x32, 0x8f, 0x9b, 0x2d, 0xc2, 0x35,
-	0x7e, 0xa0, 0x2f, 0xbf, 0x61, 0xf4, 0x22, 0xad, 0x79, 0x30, 0xaa, 0xc1, 0x5b, 0x98, 0x3c, 0x77,
-	0xd2, 0x7e, 0xc6, 0xad, 0x71, 0xb6, 0x33, 0x0d, 0x4a, 0x98, 0x0f, 0xa2, 0xe8, 0x11, 0x23, 0x57,
-	0x04, 0x6f, 0x60, 0x14, 0x8c, 0x2b, 0xad, 0x71, 0xba, 0xd3, 0xf7, 0x4d, 0xcd, 0xa7, 0x87, 0x96,
-	0xf0, 0x6c, 0xf4, 0xad, 0x4f, 0x02, 0x7f, 0xfd, 0x1b, 0x00, 0x00, 0xff, 0xff, 0xaa, 0x06, 0x3e,
-	0x3f, 0x81, 0x01, 0x00, 0x00,
+	// 238 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x64, 0x8e, 0xc1, 0x4a, 0xc4, 0x30,
+	0x10, 0x86, 0x1d, 0xdb, 0x2a, 0x3b, 0x2e, 0x8a, 0x83, 0x87, 0xb0, 0x78, 0x28, 0x3d, 0xe5, 0x20,
+	0x45, 0x56, 0xbc, 0x78, 0xd3, 0x93, 0x07, 0x4f, 0xf5, 0x09, 0xb2, 0xdd, 0x40, 0x83, 0xdd, 0x4c,
+	0x69, 0xa2, 0xac, 0xfb, 0x02, 0xbe, 0xb6, 0x24, 0x01, 0x6d, 0xd9, 0x53, 0xe6, 0xff, 0xbe, 0x99,
+	0xc9, 0xe0, 0xe5, 0x41, 0x8f, 0xdc, 0xb2, 0xb1, 0xf5, 0x30, 0xb2, 0x67, 0x2a, 0xe2, 0x53, 0xfd,
+	0x00, 0x16, 0x2f, 0x3d, 0xb7, 0x1f, 0x74, 0x83, 0x85, 0xb1, 0x5b, 0xbd, 0x17, 0x50, 0x82, 0xcc,
+	0x9b, 0x14, 0x88, 0x30, 0xef, 0x94, 0xeb, 0xc4, 0x69, 0x09, 0x72, 0xd1, 0xc4, 0x9a, 0x2a, 0x5c,
+	0x0e, 0xa3, 0xfe, 0x32, 0xfc, 0xe9, 0x5e, 0x83, 0xcb, 0xa2, 0x9b, 0x31, 0xba, 0xc5, 0x85, 0x37,
+	0x3b, 0xed, 0xbc, 0xda, 0x0d, 0x22, 0x2f, 0x41, 0x66, 0xcd, 0x3f, 0x08, 0x5b, 0xb7, 0xca, 0x2b,
+	0x51, 0xa4, 0xad, 0xa1, 0xae, 0x9e, 0x10, 0xe3, 0x21, 0x6d, 0xa7, 0x8c, 0xa5, 0x3b, 0xc4, 0xcd,
+	0x5f, 0x12, 0x50, 0x66, 0xf2, 0x62, 0xbd, 0x4c, 0xa7, 0xd7, 0xb1, 0xad, 0x99, 0xf8, 0xf5, 0x1e,
+	0xaf, 0xde, 0xbf, 0x6d, 0xdb, 0x8d, 0x6c, 0xcd, 0x41, 0x79, 0xc3, 0x96, 0x6a, 0xc4, 0x80, 0xde,
+	0x94, 0xd7, 0xce, 0xd3, 0x6c, 0x74, 0x35, 0x4b, 0xd5, 0x89, 0x84, 0x7b, 0xa0, 0x47, 0x3c, 0x0f,
+	0xfd, 0xcf, 0x7d, 0x4f, 0xd7, 0x53, 0x1d, 0x3f, 0x58, 0x1d, 0xa3, 0x34, 0xb6, 0x39, 0x8b, 0xfc,
+	0xe1, 0x37, 0x00, 0x00, 0xff, 0xff, 0x73, 0xbf, 0x9d, 0x73, 0x5f, 0x01, 0x00, 0x00,
 }

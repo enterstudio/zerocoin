@@ -4,17 +4,18 @@ import (
 	"log"
 
 	"github.com/spiermar/zerocoin/block"
+	"github.com/spiermar/zerocoin/proto"
 )
 
-var blockchain []*block.Block
+var blockchain []*proto.Block
 
 // GetGenesisBlock returns the genesis block
-func GetGenesisBlock() *block.Block {
+func GetGenesisBlock() *proto.Block {
 	return blockchain[0]
 }
 
 // GetLatestBlock returns the last block on the blockchain
-func GetLatestBlock() *block.Block {
+func GetLatestBlock() *proto.Block {
 	return blockchain[len(blockchain)-1]
 }
 
@@ -25,12 +26,12 @@ func GenerateGenesisBlock(data string) {
 }
 
 // isValidGenesis validates the genesis block
-func isValidGenesis(block *block.Block) bool {
+func isValidGenesis(block *proto.Block) bool {
 	return GetGenesisBlock().Hash == block.Hash
 }
 
 // GenerateNextBlock generates a new block with the provided data
-func GenerateNextBlock(data string) *block.Block {
+func GenerateNextBlock(data string) *proto.Block {
 	previousBlock := GetLatestBlock()
 	nextIndex := previousBlock.Index + 1
 	newBlock := block.NewBlock(nextIndex, previousBlock.Hash, data)
@@ -39,7 +40,7 @@ func GenerateNextBlock(data string) *block.Block {
 }
 
 // isValidChain validates a blockchain
-func isValidChain(blockchainToValidate []*block.Block) bool {
+func isValidChain(blockchainToValidate []*proto.Block) bool {
 	if !isValidGenesis(blockchainToValidate[0]) {
 		return false
 	}
@@ -53,11 +54,25 @@ func isValidChain(blockchainToValidate []*block.Block) bool {
 	return true
 }
 
-// replaceChain checks if a new chain is valid and longer and replaces the blockchain
-func replaceChain(newBlocks []*block.Block) {
+// ReplaceChain checks if a new chain is valid and longer and replaces the blockchain
+func ReplaceChain(newBlocks []*proto.Block) bool {
 	if isValidChain(newBlocks) && len(newBlocks) > len(blockchain) {
 		blockchain = newBlocks
 	} else {
 		log.Println("Invalid blockchain received.")
+		return false
 	}
+	return true
+}
+
+// AddBlockToChain checks the block and adds it to the chain
+func AddBlockToChain(newBlock *proto.Block) bool {
+	latestBlockHeld := GetLatestBlock()
+	if block.IsValidBlock(newBlock, latestBlockHeld) {
+		blockchain = append(blockchain, newBlock)
+	} else {
+		log.Println("Invalid block received.")
+		return false
+	}
+	return true
 }

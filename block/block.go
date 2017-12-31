@@ -6,16 +6,9 @@ import (
 	"encoding/base64"
 	"strconv"
 	"time"
-)
 
-// Block represents a blockchain block
-type Block struct {
-	Index        uint64
-	Hash         string
-	PreviousHash string
-	Timestamp    int64
-	Data         string
-}
+	"github.com/spiermar/zerocoin/proto"
+)
 
 func calculateHash(index uint64, previousHash string, timestamp int64, data string) string {
 	var b bytes.Buffer
@@ -29,14 +22,14 @@ func calculateHash(index uint64, previousHash string, timestamp int64, data stri
 	return s
 }
 
-func calculateHashForBlock(block *Block) string {
+func calculateHashForBlock(block *proto.Block) string {
 	return calculateHash(block.Index, block.PreviousHash, block.Timestamp, block.Data)
 }
 
 // NewBlock returns a new Block
-func NewBlock(index uint64, previousHash string, data string) *Block {
+func NewBlock(index uint64, previousHash string, data string) *proto.Block {
 	n := time.Now()
-	b := new(Block)
+	b := new(proto.Block)
 	b.Index = index
 	b.Hash = calculateHash(index, previousHash, n.Unix(), data)
 	b.PreviousHash = previousHash
@@ -46,7 +39,7 @@ func NewBlock(index uint64, previousHash string, data string) *Block {
 }
 
 // IsValidBlock validates a block against a previous block
-func IsValidBlock(block *Block, previousBlock *Block) bool {
+func IsValidBlock(block *proto.Block, previousBlock *proto.Block) bool {
 	if previousBlock.Index+1 != block.Index {
 		return false
 	} else if previousBlock.Hash != block.PreviousHash {
